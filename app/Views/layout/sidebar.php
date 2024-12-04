@@ -14,7 +14,7 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="/home" class="nav-link">
+                            <a href="/" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
                                     Home
@@ -22,7 +22,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/home" class="nav-link">
+                            <a href="/" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p>
                                     Data Alternatif
@@ -30,7 +30,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/home" class="nav-link">
+                            <a href="/" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p>
                                     Data Kriteria
@@ -38,10 +38,18 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/home" class="nav-link">
+                            <a href="/" class="nav-link">
                                 <i class="nav-icon fas fa-copy"></i>
                                 <p>
                                     Data Perbandingan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/padi/wp" class="nav-link">
+                                <i class="nav-icon fas fa-copy"></i>
+                                <p>
+                                    Hasil WP
                                 </p>
                             </a>
                         </li>

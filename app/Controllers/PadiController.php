@@ -21,14 +21,10 @@ class PadiController extends BaseController
 
     public function index()
     {
-        // Ambil data kriteria dan alternatif
         $kriteria = $this->kriteriaModel->findAll();
         $alternatif = $this->alternatifModel->findAll();
-
-        // Ambil data penilaian berdasarkan alternatif dan kriteria
         $penilaian = $this->penilaianModel->findAll();
 
-        // Kirim data ke view untuk ditampilkan
         return view('pages/index', [
             'kriteria' => $kriteria,
             'alternatif' => $alternatif,
@@ -39,7 +35,6 @@ class PadiController extends BaseController
 
     public function hitungWP()
     {
-        // Ambil data kriteria dan bobot
         $kriteria = $this->kriteriaModel->findAll();
         $alternatif = $this->alternatifModel->findAll();
 
@@ -94,10 +89,24 @@ class PadiController extends BaseController
             $alternatif_by_id[$alt['id_alternatif']] = $alt;
         }
 
-        return view('pages/view_alternatif', [
-            'preferensi_v' => $preferensi_v,
+        // Menambahkan ranking
+        $temp = [];
+        $temp = $preferensi_v;
+        arsort($temp);
+        $ranking = [];
+        $rank = 1;
+        foreach ($temp as $id_alternatif => $v) {
+            $ranking[$id_alternatif] = $rank++;
+        }
+
+        $data = [
+            'title' => 'Hasil WP | Padi Terbaik',
             'vektor_s' => $vektor_s,
             'alternatif' => $alternatif_by_id,
-        ]);
+            'preferensi_v' => $preferensi_v,
+            'ranking' => $ranking,
+        ];
+
+        return view('pages/view_hasil', $data);
     }
 }

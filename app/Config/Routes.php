@@ -7,4 +7,4 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->get('/padi', 'PadiController::index');
-$routes->get('/padi/hitung', 'PadiController::hitungWP');
+$routes->get('/padi/wp', 'PadiController::hitungWP');
