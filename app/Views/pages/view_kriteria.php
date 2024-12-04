@@ -11,7 +11,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Data Alternatif</li>
+                    <li class="breadcrumb-item active">Data Kriteria</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -24,23 +24,27 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Data Alternatif</h3>
+                <h3 class="card-title">Data Kriteria</h3>
             </div>
             <!-- /.card-header -->
             <div class="card-body">
                 <table id="example1" class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>ID Alternatif</th>
-                            <th>Nama Alternatif</th>
+                            <th>ID Kriteria</th>
+                            <th>Nama Kriteria</th>
+                            <th>Bobot</th>
+                            <th>Jenis</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $counter = 1; ?>
-                        <?php foreach ($alternatif as $alt): ?>
+                        <?php foreach ($kriteria as $k): ?>
                             <tr>
-                                <td>X<?= $counter++ ?></td>
-                                <td><?= $alt['nama_alternatif'] ?></td>
+                                <td>R<?= $counter++ ?></td>
+                                <td><?= $k['nama_kriteria'] ?></td>
+                                <td><?= $k['bobot'] ?></td>
+                                <td><?= $k['jenis'] ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

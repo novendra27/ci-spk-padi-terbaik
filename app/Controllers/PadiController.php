@@ -32,6 +32,58 @@ class PadiController extends BaseController
         ]);
     }
 
+    public function tampilkanAlternatif()
+    {
+        $alternatif = $this->alternatifModel->findAll();
+
+        $data = [
+            'title' => 'Data Alternatif | Padi Terbaik',
+            'alternatif' => $alternatif,
+        ];
+
+        return view('pages/view_alternatif', $data);
+    }
+
+    public function tampilkanKriteria()
+    {
+
+        $kriteria = $this->kriteriaModel->findAll();
+
+        $data = [
+            'title' => 'Data Kriteria | Padi Terbaik',
+            'kriteria' => $kriteria,
+        ];
+
+        return view('pages/view_kriteria', $data);
+    }
+
+    public function tampilkanPenilaian()
+    {
+        // Ambil data dari tabel tb_penilaian
+        $penilaian = $this->penilaianModel->findAll();
+
+        // Ambil data kriteria (R1 - R6)
+        $kriteria = $this->kriteriaModel->findAll();
+
+        // Ambil data alternatif
+        $alternatif = $this->alternatifModel->findAll();
+
+        // Organisasi penilaian dalam format yang mudah digunakan di view
+        $data_penilaian = [];
+        foreach ($penilaian as $p) {
+            $data_penilaian[$p['id_alternatif']][$p['id_kriteria']] = $p['nilai'];
+        }
+
+        // Kirim data ke view untuk ditampilkan
+        $data = [
+            'title' => 'Data Penilaian | Padi Terbaik',
+            'penilaian' => $data_penilaian,
+            'kriteria' => $kriteria,
+            'alternatif' => $alternatif,
+        ];
+
+        return view('pages/view_penilaian', $data);
+    }
 
     public function hitungWP()
     {
