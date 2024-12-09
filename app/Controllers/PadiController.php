@@ -59,22 +59,15 @@ class PadiController extends BaseController
 
     public function tampilkanPenilaian()
     {
-        // Ambil data dari tabel tb_penilaian
         $penilaian = $this->penilaianModel->findAll();
-
-        // Ambil data kriteria (R1 - R6)
         $kriteria = $this->kriteriaModel->findAll();
-
-        // Ambil data alternatif
         $alternatif = $this->alternatifModel->findAll();
 
-        // Organisasi penilaian dalam format yang mudah digunakan di view
         $data_penilaian = [];
         foreach ($penilaian as $p) {
             $data_penilaian[$p['id_alternatif']][$p['id_kriteria']] = $p['nilai'];
         }
 
-        // Kirim data ke view untuk ditampilkan
         $data = [
             'title' => 'Data Penilaian | Padi Terbaik',
             'penilaian' => $data_penilaian,
@@ -159,6 +152,95 @@ class PadiController extends BaseController
             'ranking' => $ranking,
         ];
 
-        return view('pages/view_hasil', $data);
+        return view('pages/view_wp', $data);
+    }
+
+    public function hitungTOPSIS()
+    {
+        // Langkah 1: Ambil data alternatif, kriteria, dan penilaian
+        $alternatif = $this->alternatifModel->findAll();
+        $kriteria = $this->kriteriaModel->findAll();
+        $penilaian = $this->penilaianModel->findAll();
+
+        // Matriks Penilaian
+        $data_penilaian = [];
+        foreach ($penilaian as $p) {
+            $data_penilaian[$p['id_alternatif']][$p['id_kriteria']] = $p['nilai'];
+        }
+
+        // Langkah 1: Normalisasi Matriks
+        $normalisasi = [];
+        foreach ($data_penilaian as $id_alternatif => $penilaian_alternatif) {
+            foreach ($penilaian_alternatif as $id_kriteria => $nilai) {
+                $normalisasi[$id_alternatif][$id_kriteria] = $nilai / sqrt(array_sum(array_map(function ($x) use ($id_kriteria) {
+                    return pow($x[$id_kriteria], 2);
+                }, $data_penilaian)));
+            }
+        }
+
+        // Langkah 2: Matriks Ternormalisasi Terbobot
+        $bobot_normalisasi = [];
+        foreach ($kriteria as $k) {
+            $bobot_normalisasi[$k['id_kriteria']] = $k['bobot'] / array_sum(array_column($kriteria, 'bobot'));
+        }
+
+        $ternormalisasi_terbobot = [];
+        foreach ($normalisasi as $id_alternatif => $penilaian_alternatif) {
+            foreach ($penilaian_alternatif as $id_kriteria => $nilai_normalisasi) {
+                $ternormalisasi_terbobot[$id_alternatif][$id_kriteria] = $nilai_normalisasi * $bobot_normalisasi[$id_kriteria];
+            }
+        }
+
+        // Langkah 3: Solusi Ideal Positif dan Negatif
+        $PIS = $NIS = [];
+        foreach ($kriteria as $k) {
+            $PIS[$k['id_kriteria']] = max(array_column($ternormalisasi_terbobot, $k['id_kriteria']));
+            $NIS[$k['id_kriteria']] = min(array_column($ternormalisasi_terbobot, $k['id_kriteria']));
+        }
+
+        // Langkah 4: Menghitung Jarak ke PIS dan NIS
+        $D_plus = $D_minus = [];
+        foreach ($ternormalisasi_terbobot as $id_alternatif => $penilaian_alternatif) {
+            $D_plus[$id_alternatif] = $D_minus[$id_alternatif] = 0;
+            foreach ($penilaian_alternatif as $id_kriteria => $nilai) {
+                $D_plus[$id_alternatif] += pow($nilai - $PIS[$id_kriteria], 2);
+                $D_minus[$id_alternatif] += pow($nilai - $NIS[$id_kriteria], 2);
+            }
+            $D_plus[$id_alternatif] = sqrt($D_plus[$id_alternatif]);
+            $D_minus[$id_alternatif] = sqrt($D_minus[$id_alternatif]);
+        }
+
+        // Langkah 5: Menghitung Nilai Preferensi
+        $preferensi = [];
+        foreach ($D_plus as $id_alternatif => $D_p) {
+            $preferensi[$id_alternatif] = $D_minus[$id_alternatif] / ($D_plus[$id_alternatif] + $D_minus[$id_alternatif]);
+        }
+
+        // Langkah 6: Perangkingan Alternatif
+        $temp = [];
+        $temp = $preferensi;
+        arsort($temp);
+        $ranking = [];
+        $rank = 1;
+        foreach ($temp as $id_alternatif => $v) {
+            $ranking[$id_alternatif] = $rank++;
+        }
+
+        // Ubah struktur alternatif menjadi array yang menggunakan id_alternatif sebagai key
+        $alternatif_by_id = [];
+        foreach ($alternatif as $alt) {
+            $alternatif_by_id[$alt['id_alternatif']] = $alt;
+        }
+
+        // Kirim data ke view
+        $data = [
+            'title' => 'Hasil TOPSIS | Padi Terbaik',
+            'alternatif' => $alternatif_by_id,
+            'preferensi' => $preferensi,
+            'vektor_s' => $ternormalisasi_terbobot,
+            'ranking' => $ranking,
+        ];
+
+        return view('pages/view_topsis', $data);
     }
 }
